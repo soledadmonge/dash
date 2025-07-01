@@ -4,6 +4,7 @@ import plotly.express as px
 from dash import Dash, dcc, html, Input, Output, callback_context
 from sklearn.preprocessing import MinMaxScaler
 import dash
+import os
 
 # === Load Data ===
 df_madrid = pd.read_csv("data/madrid.csv")
@@ -188,4 +189,4 @@ register_callback("madrid", df_madrid, geo_madrid)
 register_callback("cataluna", df_cataluna, geo_cataluna)
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8052)
+    app.run_server(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8050)))
