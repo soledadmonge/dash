@@ -45,7 +45,7 @@ def manual_inputs_block(title, keys, prefix, weights):
                 dcc.Input(
                     id=f"{prefix}_w_{key}",
                     type="number",
-                    value=weights[key],
+                    value="{:.3f}".format(weights[key]),
                     step=0.001,
                     style={"marginRight": "10px", "width": "80px"}
                 )
@@ -194,26 +194,19 @@ def register_callback(region, df, geo):
 
         gdf["color"] = gdf["top_10"].map({True: "Top 10", False: "Others"})
 
-        fig = px.choropleth_mapbox(
+        fig = px.choropleth(
             gdf,
             geojson=gdf.geometry,
             locations=gdf.index,
             color="color",
             color_discrete_map={"Top 10": "red", "Others": "lightgrey"},
-            mapbox_style="carto-positron",
-            center={"lat": 41.5, "lon": 1.5} if region == "cataluna" else {"lat": 40.4, "lon": -3.7},
-            zoom=7,
-            opacity=0.6,
             hover_name="municipality_name",
-            hover_data={
-                "zone_score": ":.2f",
-                "sociodemo_score_norm": ":.2f",
-                "business_score_norm": ":.2f",
-                "competitor_score_norm": ":.2f",
-                "color": False,
-                "top_10": False
-            }
+            hover_data={...},
+            projection="mercator"
         )
+        fig.update_geos(fitbounds="locations", visible=False)
+        ig.update_layout(mapbox_style="carto-positron", mapbox_zoom=7,
+                  mapbox_center={"lat": 40.4, "lon": -3.7})
 
         table_df = df_copy[df_copy["top_10"]].sort_values("zone_score", ascending=False)[[
             "municipality", "municipality_name", "sociodemo_score_norm",
