@@ -5,10 +5,10 @@ from dash import Dash, dcc, html, Input, Output, callback_context
 from sklearn.preprocessing import MinMaxScaler
 
 # === Load Data ===
-df_madrid = pd.read_csv("madrid.csv")
-df_cataluna = pd.read_csv("cataluna.csv")
-geo_madrid = gpd.read_file("municipalities_madrid.geojson")
-geo_cataluna = gpd.read_file("municipalities_cataluna.geojson")
+df_madrid = pd.read_csv("data/madrid.csv")
+df_cataluna = pd.read_csv("data/cataluna.csv")
+geo_madrid = gpd.read_file("data/municipalities_madrid.geojson")
+geo_cataluna = gpd.read_file("data/municipalities_cataluna.geojson")
 
 df_madrid["municipality"] = df_madrid["municipality"].astype(str)
 df_cataluna["municipality"] = df_cataluna["municipality"].astype(str).str.zfill(5)
