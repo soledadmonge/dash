@@ -3,6 +3,7 @@ import geopandas as gpd
 import plotly.express as px
 from dash import Dash, dcc, html, Input, Output, callback_context
 from sklearn.preprocessing import MinMaxScaler
+import dash
 
 # === Load Data ===
 df_madrid = pd.read_csv("data/madrid.csv")
