@@ -4,6 +4,7 @@ import plotly.express as px
 from dash import Dash, dcc, html, Input, Output
 from dash.dash_table import DataTable
 from sklearn.preprocessing import MinMaxScaler
+import os
 
 # === Load Data ===
 df_madrid = pd.read_csv("data/madrid.csv")
