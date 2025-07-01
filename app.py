@@ -45,8 +45,8 @@ def manual_inputs_block(title, keys, prefix, weights):
                 dcc.Input(
                     id=f"{prefix}_w_{key}",
                     type="number",
-                    value=weights[key],
-                    step=0.0001,
+                    value="{:.3f}".format(weights[key]),
+                    step=0.001,
                     style={"marginRight": "10px", "width": "80px"}
                 )
             ], style={"display": "inline-block", "marginRight": "15px"})
