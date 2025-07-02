@@ -41,6 +41,31 @@ def manual_inputs_block(title, keys, prefix, weights):
 app.layout = html.Div([
     html.H1("Interactive Dashboard: Top Municipalities in Madrid", style={"marginBottom": "20px"}),
 
+    html.P("""
+        This is an interactive dashboard designed to identify the top 10 municipalities to open new bank branches in Madrid based 
+        on sociodemographic, business, and competition characteristics.
+    """),
+    html.P("""
+        - Sociodemographic variables include the number of high-income individuals, professionals, and Europeans 
+        (both Spanish and foreign citizens from the European Union). These variables are also represented as ratios, 
+        adjusted by the total population of each municipality.
+    """),
+    html.P("""
+        - Business variables include the number of new companies, medium/large companies, and high-profit companies. 
+        Additionally, ratio-based variables are included, such as business growth rate and the ratios of medium/large 
+        companies and high-profit companies—each relative to the total number of companies in the municipality.
+    """),
+    html.P("""
+        - The competition variable is defined as the inverse of the total number of banks in each municipality. 
+        A competition score near 0 indicates high competition (many banks), while a score close to 1 suggests 
+        little or no competition.
+    """),
+    html.P("""
+        Finally, each municipality’s Zone Score is calculated as a weighted sum of the Sociodemographic Score, 
+        Business Score, and Competitor Score. The default weights, shown below, were obtained using the PCA method, 
+        but they can be adjusted directly in this dashboard according to the bank’s strategic preferences.
+    """),
+
     html.Hr(),
 
     html.H4("1. Choose Sociodemographic and Business Variables Weights (each category must sum 1)", style={"marginTop": "20px"}),
