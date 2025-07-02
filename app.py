@@ -1,6 +1,6 @@
 import pandas as pd
 import geopandas as gpd
-import plotly.express as px
+from plotly.express.maplibre import choropleth_map
 from dash import Dash, dcc, html, Input, Output
 from dash.dash_table import DataTable
 from sklearn.preprocessing import MinMaxScaler
@@ -144,15 +144,14 @@ def update_map(*weights):
     df_copy["top_10"] = df_copy["zone_score"].rank(method="min", ascending=False) <= 10
     df_copy["color"] = df_copy["top_10"].map({True: "Top 10", False: "Others"})
 
-    fig = px.choropleth_mapbox(
-        df_copy,
-        geojson=df_copy.geometry,
-        locations=df_copy.index,
+    fig = choropleth_map(
+        gdf_madrid,
+        geojson=gdf_madrid.geometry,
+        locations=gdf_madrid.index,
         color="color",
-        color_discrete_map={"Top 10": "red", "Others": "lightgrey"},
-        mapbox_style=None,
         center={"lat": 40.5, "lon": -3.7},
         zoom=8,
+        map_style="carto-positron",
         opacity=0.6,
         hover_name="municipality_name",
         hover_data={
@@ -164,6 +163,7 @@ def update_map(*weights):
             "top_10": False
         }
     )
+
 
     table_df = df_copy[df_copy["top_10"]].sort_values("zone_score", ascending=False)[[
         "municipality", "municipality_name", "sociodemo_score_norm",
