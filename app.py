@@ -144,13 +144,13 @@ def update_map(*weights):
     df_copy["top_10"] = df_copy["zone_score"].rank(method="min", ascending=False) <= 10
     df_copy["color"] = df_copy["top_10"].map({True: "Top 10", False: "Others"})
 
-    fig = px.choropleth_map(
+    fig = px.choropleth_mapbox(
         df_copy,
         geojson=df_copy.geometry,
         locations=df_copy.index,
         color="color",
         color_discrete_map={"Top 10": "red", "Others": "lightgrey"},
-        style=None,
+        mapbox_style=None
         center={"lat": 40.5, "lon": -3.7},
         zoom=8,
         opacity=0.6,
