@@ -145,9 +145,9 @@ def update_map(*weights):
     df_copy["color"] = df_copy["top_10"].map({True: "Top 10", False: "Others"})
 
     fig = px.choropleth_mapbox(
-        gdf,
-        geojson=gdf.geometry,
-        locations=gdf.index,
+        df_copy,
+        geojson=df_copy.geometry,
+        locations=df_copy.index,
         color="color",
         color_discrete_map={"Top 10": "red", "Others": "lightgrey"},
         mapbox_style="carto-positron",
