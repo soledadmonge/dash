@@ -1,10 +1,10 @@
+import os
 import pandas as pd
 import geopandas as gpd
 import plotly.express as px
 from dash import Dash, dcc, html, Input, Output
 from dash.dash_table import DataTable
 from sklearn.preprocessing import MinMaxScaler
-import os
 
 # === Load Data ===
 gdf_madrid = gpd.read_file("data/gdf_madrid.gpkg")
@@ -39,51 +39,45 @@ def manual_inputs_block(title, keys, prefix, weights):
         ])
     ])
 
-def create_region_tab(region, df, weights):
-    prefix = region
-
-    sociodemo_keys = [("High", "high"), ("High Ratio", "high_ratio"),
-                      ("Professionals", "pro"), ("Professionals Ratio", "pro_ratio"),
-                      ("Europeans", "eur"), ("Europeans Ratio", "eur_ratio")]
-
-    business_keys = [("New Companies", "new_comp"), ("Growth Rate", "growth"),
-                     ("Medium/Large Companies", "ml"), ("High Profit Companies", "hp"),
-                     ("Size Ratio", "size"), ("Profit Ratio", "profit")]
-
-    zone_keys = [("Sociodemographic Score", "sociozone"),
-                 ("Business Score", "businesszone"),
-                 ("Competitor Score", "comp")]
-
-    return dcc.Tab(label=region.capitalize(), children=html.Div([
-        html.H4(f"{region.capitalize()} - Zone Score", style={"fontWeight": "bold"}),
-
-        html.Hr(),
-        html.H4("1. Choose Sociodemographic and Business Variables Weights (each category must sum 1)", style={"marginTop": "20px"}),
-        manual_inputs_block("Sociodemographic Weights", sociodemo_keys, prefix, weights),
-        manual_inputs_block("Business Weights", business_keys, prefix, weights),
-
-        html.Hr(),
-        html.H4("2. Choose Sociodemographic, Business and Competitor Score Weights (must sum 1)", style={"marginTop": "30px"}),
-        manual_inputs_block("Zone Score Weights", zone_keys, prefix, weights),
-
-        html.Hr(),
-        html.Div(id=f"{prefix}_warning", style={"color": "red", "fontWeight": "bold", "marginTop": 20}),
-        html.H4("Zone Score Map", style={"marginTop": "30px"}),
-        dcc.Graph(id=f"{prefix}_map"),
-        html.H4("Top 10 Municipalities", style={"marginTop": "30px"}),
-        html.Div(id=f"{prefix}_table", style={"marginBottom": "50px"})
-    ]))
-
+# === App Layout (sin pestañas) ===
 app.layout = html.Div([
     html.H1("Interactive Dashboard: Top Municipalities in Madrid", style={"marginBottom": "20px"}),
 
-    html.Hr(style={"margin": "30px 0"}),
+    html.Hr(),
 
-    dcc.Tabs([
-        create_region_tab("madrid", gdf_madrid, pca_weights["madrid"])
-    ])
+    html.H4("1. Choose Sociodemographic and Business Variables Weights (each category must sum 1)", style={"marginTop": "20px"}),
+
+    manual_inputs_block("Sociodemographic Weights", [
+        ("High", "high"), ("High Ratio", "high_ratio"),
+        ("Professionals", "pro"), ("Professionals Ratio", "pro_ratio"),
+        ("Europeans", "eur"), ("Europeans Ratio", "eur_ratio")
+    ], "madrid", pca_weights["madrid"]),
+
+    manual_inputs_block("Business Weights", [
+        ("New Companies", "new_comp"), ("Growth Rate", "growth"),
+        ("Medium/Large Companies", "ml"), ("High Profit Companies", "hp"),
+        ("Size Ratio", "size"), ("Profit Ratio", "profit")
+    ], "madrid", pca_weights["madrid"]),
+
+    html.Hr(),
+
+    html.H4("2. Choose Sociodemographic, Business and Competitor Score Weights (must sum 1)", style={"marginTop": "30px"}),
+
+    manual_inputs_block("Zone Score Weights", [
+        ("Sociodemographic Score", "sociozone"),
+        ("Business Score", "businesszone"),
+        ("Competitor Score", "comp")
+    ], "madrid", pca_weights["madrid"]),
+
+    html.Hr(),
+    html.Div(id="madrid_warning", style={"color": "red", "fontWeight": "bold", "marginTop": 20}),
+    html.H4("Zone Score Map", style={"marginTop": "30px"}),
+    dcc.Graph(id="madrid_map"),
+    html.H4("Top 10 Municipalities", style={"marginTop": "30px"}),
+    html.Div(id="madrid_table", style={"marginBottom": "50px"})
 ])
 
+# === Callback ===
 @app.callback(
     Output("madrid_map", "figure"),
     Output("madrid_warning", "children"),
@@ -100,6 +94,7 @@ def update_map(*weights):
             "sociozone", "businesszone", "comp"]
     w = dict(zip(keys, weights))
 
+    # Check weight constraints
     sociodemo_sum = sum(w[k] for k in ["high", "high_ratio", "pro", "pro_ratio", "eur", "eur_ratio"])
     business_sum = sum(w[k] for k in ["new_comp", "growth", "ml", "hp", "size", "profit"])
     zone_total = w["sociozone"] + w["businesszone"] + w["comp"]
@@ -111,43 +106,43 @@ def update_map(*weights):
     if abs(zone_total - 1.0) > 0.01:
         return {}, f"Zone Score weights must sum to 1.0. Currently: {zone_total:.2f}", None
 
-    df_copy = gdf_madrid.copy()
+    df = gdf_madrid.copy()
 
-    df_copy["sociodemo_score"] = (
-        w["high"] * df_copy["high_score"] +
-        w["high_ratio"] * df_copy["high_ratio_score"] +
-        w["pro"] * df_copy["professionals_score"] +
-        w["pro_ratio"] * df_copy["professionals_ratio_score"] +
-        w["eur"] * df_copy["europeans_score"] +
-        w["eur_ratio"] * df_copy["europeans_ratio_score"]
+    df["sociodemo_score"] = (
+        w["high"] * df["high_score"] +
+        w["high_ratio"] * df["high_ratio_score"] +
+        w["pro"] * df["professionals_score"] +
+        w["pro_ratio"] * df["professionals_ratio_score"] +
+        w["eur"] * df["europeans_score"] +
+        w["eur_ratio"] * df["europeans_ratio_score"]
     )
 
-    df_copy["business_score"] = (
-        w["new_comp"] * df_copy["NumNewCompanies_10S_score"] +
-        w["growth"] * df_copy["growth_rate_10S_score"] +
-        w["ml"] * df_copy["NumCompanies_ML_10S_score"] +
-        w["hp"] * df_copy["NumCompanies_HP_10S_score"] +
-        w["size"] * df_copy["companies_size_ratio_10S_score"] +
-        w["profit"] * df_copy["companies_profit_ratio_10S_score"]
+    df["business_score"] = (
+        w["new_comp"] * df["NumNewCompanies_10S_score"] +
+        w["growth"] * df["growth_rate_10S_score"] +
+        w["ml"] * df["NumCompanies_ML_10S_score"] +
+        w["hp"] * df["NumCompanies_HP_10S_score"] +
+        w["size"] * df["companies_size_ratio_10S_score"] +
+        w["profit"] * df["companies_profit_ratio_10S_score"]
     )
 
-    df_copy[["sociodemo_score_norm", "business_score_norm", "competitor_score_norm"]] = MinMaxScaler().fit_transform(
-        df_copy[["sociodemo_score", "business_score", "competitor_score"]]
+    df[["sociodemo_score_norm", "business_score_norm", "competitor_score_norm"]] = MinMaxScaler().fit_transform(
+        df[["sociodemo_score", "business_score", "competitor_score"]]
     )
 
-    df_copy["zone_score"] = (
-        w["sociozone"] * df_copy["sociodemo_score_norm"] +
-        w["businesszone"] * df_copy["business_score_norm"] +
-        w["comp"] * df_copy["competitor_score_norm"]
+    df["zone_score"] = (
+        w["sociozone"] * df["sociodemo_score_norm"] +
+        w["businesszone"] * df["business_score_norm"] +
+        w["comp"] * df["competitor_score_norm"]
     )
 
-    df_copy["top_10"] = df_copy["zone_score"].rank(method="min", ascending=False) <= 10
-    df_copy["color"] = df_copy["top_10"].map({True: "Top 10", False: "Others"})
+    df["top_10"] = df["zone_score"].rank(method="min", ascending=False) <= 10
+    df["color"] = df["top_10"].map({True: "Top 10", False: "Others"})
 
     fig = px.choropleth_mapbox(
-        df_copy,
-        geojson=df_copy.geometry,
-        locations=df_copy.index,
+        df,
+        geojson=df.geometry,
+        locations=df.index,
         color="color",
         color_discrete_map={"Top 10": "red", "Others": "lightgrey"},
         mapbox_style="carto-positron",
@@ -165,9 +160,8 @@ def update_map(*weights):
         }
     )
 
-
-
-    table_df = df_copy[df_copy["top_10"]].sort_values("zone_score", ascending=False)[[
+    # Create top 10 table
+    table_df = df[df["top_10"]].sort_values("zone_score", ascending=False)[[
         "municipality", "municipality_name", "sociodemo_score_norm",
         "business_score_norm", "competitor_score_norm", "zone_score"
     ]].copy()
@@ -193,5 +187,3 @@ def update_map(*weights):
 
 if __name__ == "__main__":
     app.run(debug=False, host="0.0.0.0", port=int(os.environ.get("PORT", 8050)))
-
-
