@@ -150,7 +150,7 @@ def update_map(*weights):
         locations=df_copy.index,
         color="color",
         color_discrete_map={"Top 10": "red", "Others": "lightgrey"},
-        mapbox_style=None
+        mapbox_style=None,
         center={"lat": 40.5, "lon": -3.7},
         zoom=8,
         opacity=0.6,
