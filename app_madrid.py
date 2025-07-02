@@ -161,6 +161,11 @@ def update_map(*weights):
         w["comp"] * df["competitor_score_norm"]
     )
 
+    df["sociodemo_score_norm"] *= 100
+    df["business_score_norm"] *= 100
+    df["competitor_score_norm"] *= 100
+    df["zone_score"] *= 100
+
     df["top_10"] = df["zone_score"].rank(method="min", ascending=False) <= 10
     df["color"] = df["top_10"].map({True: "Top 10", False: "Others"})
 
@@ -190,7 +195,7 @@ def update_map(*weights):
         "business_score_norm", "competitor_score_norm", "zone_score"
     ]].copy()
 
-    table_df = table_df.round(3)
+    table_df = table_df.round(2)
 
     table = DataTable(
         data=table_df.to_dict("records"),
