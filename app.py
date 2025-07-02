@@ -139,26 +139,31 @@ def update_map(*weights):
     df["top_10"] = df["zone_score"].rank(method="min", ascending=False) <= 10
     df["color"] = df["top_10"].map({True: "Top 10", False: "Others"})
 
+
+    # Calcula centroide promedio del mapa
+    center_lat = df.geometry.centroid.y.mean()
+    center_lon = df.geometry.centroid.x.mean()
+
     fig = px.choropleth_mapbox(
-        df,
-        geojson=df.geometry,
-        locations=df.index,
-        color="color",
-        color_discrete_map={"Top 10": "red", "Others": "lightgrey"},
-        mapbox_style="carto-positron",
-        center={"lat": 40.5, "lon": -3.7},
-        zoom=8,
-        opacity=0.6,
-        hover_name="municipality_name",
-        hover_data={
-            "zone_score": ":.2f",
-            "sociodemo_score_norm": ":.2f",
-            "business_score_norm": ":.2f",
-            "competitor_score_norm": ":.2f",
-            "color": False,
-            "top_10": False
-        }
-    )
+    df,
+    geojson=df.geometry,
+    locations=df.index,
+    color="color",
+    color_discrete_map={"Top 10": "red", "Others": "lightgrey"},
+    mapbox_style="white-bg",
+    center={"lat": center_lat, "lon": center_lon},
+    zoom=6.5,  # Zoom más bajo para ver toda la región
+    opacity=0.6,
+    hover_name="municipality_name",
+    hover_data={
+        "zone_score": ":.2f",
+        "sociodemo_score_norm": ":.2f",
+        "business_score_norm": ":.2f",
+        "competitor_score_norm": ":.2f",
+        "color": False,
+        "top_10": False
+    }
+)
 
     # Create top 10 table
     table_df = df[df["top_10"]].sort_values("zone_score", ascending=False)[[
