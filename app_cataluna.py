@@ -174,8 +174,8 @@ def update_map(*weights):
     color="color",
     color_discrete_map={"Top 10": "red", "Others": "lightgrey"},
     mapbox_style="white-bg",
-    center={"lat": 40.55, "lon": -3.69},
-    zoom=7,  # Zoom más bajo para ver toda la región
+    center={"lat": 41.74, "lon": 1.75},
+    zoom=6,  # Zoom más bajo para ver toda la región
     opacity=0.6,
     hover_name="municipality_name",
     hover_data={
