@@ -193,6 +193,7 @@ def register_callback(region, df, geo):
             locations=gdf.index,
             color="color",
             color_discrete_map={"Top 10": "red", "Others": "lightgrey"},
+            map_style="carto-positron",
             center={"lat": 41.5, "lon": 1.5} if region == "cataluna" else {"lat": 40.4, "lon": -3.7},
             zoom=7,
             opacity=0.6,
