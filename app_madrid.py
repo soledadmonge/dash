@@ -28,8 +28,8 @@ def manual_inputs_block(title, keys, prefix, weights):
                 dcc.Input(
                     id=f"{prefix}_w_{key}",
                     type="number",
-                    value=weights[key],
-                    step=0.001,
+                    value=round(weights[key] * 100, 2),
+                    step=0.01,
                     style={"marginRight": "10px", "width": "80px"}
                 )
             ], style={"display": "inline-block", "marginRight": "15px"})
@@ -68,7 +68,7 @@ app.layout = html.Div([
 
     html.Hr(),
 
-    html.H4("1. Choose Sociodemographic and Business Variables Weights (each category must sum 1)", style={"marginTop": "20px"}),
+    html.H4("1. Choose Sociodemographic and Business Variables Weights (each category must sum 100)", style={"marginTop": "20px"}),
 
     manual_inputs_block("Sociodemographic Weights", [
         ("High", "high"), ("High Ratio", "high_ratio"),
@@ -84,7 +84,7 @@ app.layout = html.Div([
 
     html.Hr(),
 
-    html.H4("2. Choose Sociodemographic, Business and Competitor Score Weights (must sum 1)", style={"marginTop": "30px"}),
+    html.H4("2. Choose Sociodemographic, Business and Competitor Score Weights (must sum 100)", style={"marginTop": "30px"}),
 
     manual_inputs_block("Zone Score Weights", [
         ("Sociodemographic Score", "sociozone"),
@@ -115,6 +115,8 @@ def update_map(*weights):
     keys = ["high", "high_ratio", "pro", "pro_ratio", "eur", "eur_ratio",
             "new_comp", "growth", "ml", "hp", "size", "profit",
             "sociozone", "businesszone", "comp"]
+    
+    weights = [w / 100 if w is not None else 0 for w in weights]
     w = dict(zip(keys, weights))
 
     # Check weight constraints
@@ -123,11 +125,11 @@ def update_map(*weights):
     zone_total = w["sociozone"] + w["businesszone"] + w["comp"]
 
     if abs(sociodemo_sum - 1.0) > 0.01:
-        return {}, f"Sociodemographic weights must sum to 1.0. Currently: {sociodemo_sum:.2f}", None
+        return {}, f"Sociodemographic weights must sum to 100. Currently: {sociodemo_sum*100:.2f}", None
     if abs(business_sum - 1.0) > 0.01:
-        return {}, f"Business weights must sum to 1.0. Currently: {business_sum:.2f}", None
+        return {}, f"Business weights must sum to 100. Currently: {business_sum*100:.2f}", None
     if abs(zone_total - 1.0) > 0.01:
-        return {}, f"Zone Score weights must sum to 1.0. Currently: {zone_total:.2f}", None
+        return {}, f"Zone Score weights must sum to 100. Currently: {zone_total*100:.2f}", None
 
     df = gdf_madrid.copy()
 
@@ -170,7 +172,7 @@ def update_map(*weights):
     color_discrete_map={"Top 10": "red", "Others": "lightgrey"},
     mapbox_style="white-bg",
     center={"lat": 40.55, "lon": -3.69},
-    zoom=7,  # Zoom más bajo para ver toda la región
+    zoom=7,  
     opacity=0.6,
     hover_name="municipality_name",
     hover_data={
@@ -183,7 +185,6 @@ def update_map(*weights):
     }
 )
 
-    # Create top 10 table
     table_df = df[df["top_10"]].sort_values("zone_score", ascending=False)[[
         "municipality", "municipality_name", "sociodemo_score_norm",
         "business_score_norm", "competitor_score_norm", "zone_score"
