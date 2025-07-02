@@ -139,11 +139,6 @@ def update_map(*weights):
     df["top_10"] = df["zone_score"].rank(method="min", ascending=False) <= 10
     df["color"] = df["top_10"].map({True: "Top 10", False: "Others"})
 
-
-    # Calcula centroide promedio del mapa
-    center_lat = df.geometry.centroid.y.mean()
-    center_lon = df.geometry.centroid.x.mean()
-
     fig = px.choropleth_mapbox(
     df,
     geojson=df.geometry,
@@ -151,8 +146,8 @@ def update_map(*weights):
     color="color",
     color_discrete_map={"Top 10": "red", "Others": "lightgrey"},
     mapbox_style="white-bg",
-    center={"lat": center_lat, "lon": center_lon},
-    zoom=7,  # Zoom más bajo para ver toda la región
+    center={"lat": 40.55, "lon": -3.69},
+    zoom=7.5,  # Zoom más bajo para ver toda la región
     opacity=0.6,
     hover_name="municipality_name",
     hover_data={
