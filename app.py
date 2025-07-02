@@ -72,7 +72,7 @@ app.layout = html.Div([
     html.Hr(),
     html.Div(id="madrid_warning", style={"color": "red", "fontWeight": "bold", "marginTop": 20}),
     html.H4("Zone Score Map", style={"marginTop": "30px"}),
-    dcc.Graph(id="madrid_map", style={"height": "700px"}),
+    dcc.Graph(id="madrid_map"),
     html.H4("Top 10 Municipalities", style={"marginTop": "30px"}),
     html.Div(id="madrid_table", style={"marginBottom": "50px"})
 ])
