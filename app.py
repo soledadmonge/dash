@@ -8,14 +8,14 @@ import os
 
 # === Load Data ===
 df_madrid = pd.read_csv("data/madrid.csv")
-df_cataluna = pd.read_csv("data/cataluna.csv")
+# df_cataluna = pd.read_csv("data/cataluna.csv")
 geo_madrid = gpd.read_file("data/municipalities_madrid.geojson")
-geo_cataluna = gpd.read_file("data/municipalities_cataluna.geojson")
+# geo_cataluna = gpd.read_file("data/municipalities_cataluna.geojson")
 
 df_madrid["municipality"] = df_madrid["municipality"].astype(str)
-df_cataluna["municipality"] = df_cataluna["municipality"].astype(str).str.zfill(5)
+# df_cataluna["municipality"] = df_cataluna["municipality"].astype(str).str.zfill(5)
 geo_madrid["municipality"] = geo_madrid["municipality"].astype(str)
-geo_cataluna["municipality"] = geo_cataluna["municipality"].astype(str)
+# geo_cataluna["municipality"] = geo_cataluna["municipality"].astype(str)
 
 pca_weights = {
     "madrid": {
@@ -24,13 +24,6 @@ pca_weights = {
         "new_comp": 0.234, "growth": 0.052, "ml": 0.230, "hp": 0.234,
         "size": 0.149, "profit": 0.101,
         "sociozone": 0.404, "businesszone": 0.483, "comp": 0.113
-    },
-    "cataluna": {
-        "high": 0.241, "high_ratio": 0.036, "pro": 0.260, "pro_ratio": 0.111,
-        "eur": 0.262, "eur_ratio": 0.090,
-        "new_comp": 0.285, "growth": 0.072, "ml": 0.283, "hp": 0.285,
-        "size": 0.036, "profit": 0.039,
-        "sociozone": 0.469, "businesszone": 0.415, "comp": 0.116
     }
 }
 
@@ -122,8 +115,8 @@ app.layout = html.Div([
     html.Hr(style={"margin": "30px 0"}),
 
     dcc.Tabs([
-        create_region_tab("madrid", df_madrid, geo_madrid, pca_weights["madrid"]),
-        create_region_tab("cataluna", df_cataluna, geo_cataluna, pca_weights["cataluna"])
+        create_region_tab("madrid", df_madrid, geo_madrid, pca_weights["madrid"])
+        # create_region_tab("cataluna", df_cataluna, geo_cataluna, pca_weights["cataluna"])
     ])
 ])
 
@@ -194,7 +187,7 @@ def register_callback(region, df, geo):
 
         gdf["color"] = gdf["top_10"].map({True: "Top 10", False: "Others"})
 
-        fig = px.choropleth_mapbox(
+        fig = px.choropleth_map(
             gdf,
             geojson=gdf.geometry,
             locations=gdf.index,
@@ -243,7 +236,7 @@ def register_callback(region, df, geo):
         return fig, "", table
 
 register_callback("madrid", df_madrid, geo_madrid)
-register_callback("cataluna", df_cataluna, geo_cataluna)
+# register_callback("cataluna", df_cataluna, geo_cataluna)
 
 if __name__ == "__main__":
     app.run(debug=False, host="0.0.0.0", port=int(os.environ.get("PORT", 8050)))
