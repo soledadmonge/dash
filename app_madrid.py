@@ -10,13 +10,11 @@ from sklearn.preprocessing import MinMaxScaler
 gdf_madrid = gpd.read_file("data/gdf_madrid.gpkg")
 
 pca_weights = {
-    "madrid": {
-        "high": 0.262, "high_ratio": 0.104, "pro": 0.285, "pro_ratio": 0.047,
-        "eur": 0.285, "eur_ratio": 0.017,
-        "new_comp": 0.234, "growth": 0.052, "ml": 0.230, "hp": 0.234,
-        "size": 0.149, "profit": 0.101,
-        "sociozone": 0.404, "businesszone": 0.483, "comp": 0.113
-    }
+    "high": 0.262, "high_ratio": 0.104, "pro": 0.285, "pro_ratio": 0.047,
+    "eur": 0.285, "eur_ratio": 0.017,
+    "new_comp": 0.234, "growth": 0.052, "ml": 0.230, "hp": 0.234,
+    "size": 0.149, "profit": 0.101,
+    "sociozone": 0.404, "businesszone": 0.483, "comp": 0.113
 }
 
 app = Dash(__name__)
@@ -51,13 +49,13 @@ app.layout = html.Div([
         ("High", "high"), ("High Ratio", "high_ratio"),
         ("Professionals", "pro"), ("Professionals Ratio", "pro_ratio"),
         ("Europeans", "eur"), ("Europeans Ratio", "eur_ratio")
-    ], "madrid", pca_weights["madrid"]),
+    ], "madrid", pca_weights),
 
     manual_inputs_block("Business Weights", [
         ("New Companies", "new_comp"), ("Growth Rate", "growth"),
         ("Medium/Large Companies", "ml"), ("High Profit Companies", "hp"),
         ("Size Ratio", "size"), ("Profit Ratio", "profit")
-    ], "madrid", pca_weights["madrid"]),
+    ], "madrid", pca_weights),
 
     html.Hr(),
 
@@ -67,7 +65,7 @@ app.layout = html.Div([
         ("Sociodemographic Score", "sociozone"),
         ("Business Score", "businesszone"),
         ("Competitor Score", "comp")
-    ], "madrid", pca_weights["madrid"]),
+    ], "madrid", pca_weights),
 
     html.Hr(),
     html.Div(id="madrid_warning", style={"color": "red", "fontWeight": "bold", "marginTop": 20}),
