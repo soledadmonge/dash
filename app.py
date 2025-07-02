@@ -7,15 +7,8 @@ from sklearn.preprocessing import MinMaxScaler
 import os
 
 # === Load Data ===
-df_madrid = pd.read_csv("data/madrid.csv")
-# df_cataluna = pd.read_csv("data/cataluna.csv")
-geo_madrid = gpd.read_file("data/municipalities_madrid.geojson")
-# geo_cataluna = gpd.read_file("data/municipalities_cataluna.geojson")
+gdf_madrid = gpd.read_file("data/gdf_madrid.gpkg")
 
-df_madrid["municipality"] = df_madrid["municipality"].astype(str)
-# df_cataluna["municipality"] = df_cataluna["municipality"].astype(str).str.zfill(5)
-geo_madrid["municipality"] = geo_madrid["municipality"].astype(str)
-# geo_cataluna["municipality"] = geo_cataluna["municipality"].astype(str)
 
 pca_weights = {
     "madrid": {
@@ -193,9 +186,9 @@ def register_callback(region, df, geo):
             locations=gdf.index,
             color="color",
             color_discrete_map={"Top 10": "red", "Others": "lightgrey"},
-            map_style="carto-positron",
-            center={"lat": 41.5, "lon": 1.5} if region == "cataluna" else {"lat": 40.4, "lon": -3.7},
-            zoom=7,
+            map_style=none,
+            center={"lat": 40.5, "lon": -3.7},
+            zoom=8,
             opacity=0.6,
             hover_name="municipality_name",
             hover_data={
