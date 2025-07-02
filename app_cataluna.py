@@ -10,11 +10,11 @@ from sklearn.preprocessing import MinMaxScaler
 gdf_cataluna = gpd.read_file("data/gdf_cataluna.gpkg")
 
 pca_weights = {
-        "high": 0.241, "high_ratio": 0.036, "pro": 0.260, "pro_ratio": 0.111,
-        "eur": 0.262, "eur_ratio": 0.090,
-        "new_comp": 0.285, "growth": 0.072, "ml": 0.283, "hp": 0.285,
-        "size": 0.036, "profit": 0.039,
-        "sociozone": 0.469, "businesszone": 0.415, "comp": 0.116
+    "high": 0.241, "high_ratio": 0.036, "pro": 0.260, "pro_ratio": 0.111,
+    "eur": 0.262, "eur_ratio": 0.090,
+    "new_comp": 0.285, "growth": 0.072, "ml": 0.283, "hp": 0.285,
+    "size": 0.036, "profit": 0.039,
+    "sociozone": 0.469, "businesszone": 0.415, "comp": 0.116
 }
 
 app = Dash(__name__)
@@ -49,13 +49,13 @@ app.layout = html.Div([
         ("High", "high"), ("High Ratio", "high_ratio"),
         ("Professionals", "pro"), ("Professionals Ratio", "pro_ratio"),
         ("Europeans", "eur"), ("Europeans Ratio", "eur_ratio")
-    ], "madrid", pca_weights["madrid"]),
+    ], "cataluna", pca_weights),
 
     manual_inputs_block("Business Weights", [
         ("New Companies", "new_comp"), ("Growth Rate", "growth"),
         ("Medium/Large Companies", "ml"), ("High Profit Companies", "hp"),
         ("Size Ratio", "size"), ("Profit Ratio", "profit")
-    ], "madrid", pca_weights["madrid"]),
+    ], "cataluna", pca_weights),
 
     html.Hr(),
 
@@ -65,22 +65,22 @@ app.layout = html.Div([
         ("Sociodemographic Score", "sociozone"),
         ("Business Score", "businesszone"),
         ("Competitor Score", "comp")
-    ], "madrid", pca_weights["madrid"]),
+    ], "cataluna", pca_weights),
 
     html.Hr(),
-    html.Div(id="madrid_warning", style={"color": "red", "fontWeight": "bold", "marginTop": 20}),
+    html.Div(id="cataluna_warning", style={"color": "red", "fontWeight": "bold", "marginTop": 20}),
     html.H4("Zone Score Map", style={"marginTop": "30px"}),
-    dcc.Graph(id="madrid_map"),
+    dcc.Graph(id="cataluna_map"),
     html.H4("Top 10 Municipalities", style={"marginTop": "30px"}),
-    html.Div(id="madrid_table", style={"marginBottom": "50px"})
+    html.Div(id="cataluna_table", style={"marginBottom": "50px"})
 ])
 
 # === Callback ===
 @app.callback(
-    Output("madrid_map", "figure"),
-    Output("madrid_warning", "children"),
-    Output("madrid_table", "children"),
-    [Input(f"madrid_w_{k}", "value") for k in [
+    Output("cataluna_map", "figure"),
+    Output("cataluna_warning", "children"),
+    Output("cataluna_table", "children"),
+    [Input(f"cataluna_w_{k}", "value") for k in [
         "high", "high_ratio", "pro", "pro_ratio", "eur", "eur_ratio",
         "new_comp", "growth", "ml", "hp", "size", "profit",
         "sociozone", "businesszone", "comp"
@@ -104,7 +104,7 @@ def update_map(*weights):
     if abs(zone_total - 1.0) > 0.01:
         return {}, f"Zone Score weights must sum to 1.0. Currently: {zone_total:.2f}", None
 
-    df = gdf_madrid.copy()
+    df = gdf_cataluna.copy()
 
     df["sociodemo_score"] = (
         w["high"] * df["high_score"] +
