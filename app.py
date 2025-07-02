@@ -1,6 +1,6 @@
 import pandas as pd
 import geopandas as gpd
-from plotly.express as px
+import plotly.express as px
 from dash import Dash, dcc, html, Input, Output
 from dash.dash_table import DataTable
 from sklearn.preprocessing import MinMaxScaler
